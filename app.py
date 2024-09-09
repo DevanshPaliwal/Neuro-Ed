@@ -17,7 +17,6 @@ def signup():
         useremail = request.form['useremail']
         password = request.form['password']
         if add_signup(useremail,password,name):
-            flash("Account created successfully")
             session['user'] = useremail
             return redirect(url_for("dashboard"))
         else:
@@ -34,7 +33,7 @@ def login():
         password = request.form['password']
         if check_login(useremail,password):
             session["user"] = useremail
-            flash("Succesful Login")
+            # flash("Succesful Login")
             return redirect(url_for("dashboard"))
         else:
             flash("Incorrect credentials or account does not exist")
@@ -51,7 +50,9 @@ def dashboard():
 # course page
 @app.route("/dashboard/course", methods=["POST","GET"])
 def course():
-    return render_template("course.html",email=session['user'])
+    state = getState(useremail=session['user'])
+    ans = (state/35)*100
+    return render_template("course.html",email=session['user'],progress = ans)
 
 # get Question or video
 @app.route("/dashboard/course/<email>",methods = ["POST","GET"])
@@ -61,31 +62,38 @@ def getQuestionOrVideo(email):
     print(questionorVideo)
     return jsonify(questionorVideo)
 
+# Increment State API
 @app.route("/dashboard/IncrementState/<email>", methods=["POST","GET"])
 def IncrementStateFunc(email):
     IncrementState(email)
     return jsonify({"Sucess":1})
 
+# Decrement State API
 @app.route("/dashboard/DecrementState/<email>", methods=["POST","GET"])
 def DecrementStateFunc(email):
     result = DecrementState(email)
     return jsonify(result)
 
+# about
 @app.route("/about")
 def about():
     return render_template("about.html")
 
+# Courses page or menu of courses
 @app.route("/courses")
 def courses():
     return render_template("Courses.html")
 
+# team
 @app.route("/team")
 def team():
     return render_template("team.html")
 
+# logout
 @app.route("/logout")
 def logout():
     session.pop("user",None)
+    # session.clear()
     return redirect(url_for("signup"))
 
 if __name__ == '__main__':
