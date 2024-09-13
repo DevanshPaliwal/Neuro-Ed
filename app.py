@@ -96,5 +96,4 @@ def logout():
     # session.clear()
     return redirect(url_for("signup"))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+
